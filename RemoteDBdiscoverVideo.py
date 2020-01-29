@@ -18,6 +18,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import inspect
 
 load_dotenv()
+db_user = os.getenv("db_user" )
+db_password = os.getenv("db_password")
+tunnel_user = os.getenv("tunnel_user")
+tunnel_password = os.getenv("tunnel_password")
 
 server = SSHTunnelForwarder(
     (tunnel_address, 21098),
@@ -28,8 +32,7 @@ server = SSHTunnelForwarder(
 )
 server.start()
 print( server.local_bind_port)
-db_user = "nogslbqf_felipon"
-db_password = "felipon123"
+
 engine = create_engine(f'mysql://{db_user}:{db_password}@127.0.0.1:3306/nogslbqf_despacho')
 
 
