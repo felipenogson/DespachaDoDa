@@ -3,7 +3,7 @@ from dotenv import load_dotenv_
 from imutils.video import VideoStream
 from pyzbar import pyzbar
 import argparse
-import datetime
+from datetime import datetime
 import imutils
 import time
 import cv2
@@ -42,8 +42,6 @@ metadata = Base.metadata
 Session = sessionmaker(bind=engine)
 session = Session()
 
-os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
-rtsp = "rtsp://felipon:felipon123@192.168.8.189/live"
  
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -104,6 +102,7 @@ while True:
 			except:
 
 				d.status = 'error'
+				d.timestamp = datetime.now()
 				session.add(d)
 				session.commit()
 				continue
@@ -111,6 +110,7 @@ while True:
 			d.caja = sat_data['candado']['Contenedores:']
 			d.sello = sat_data['candado']['Candados:']
 			d.status = 'correcto'
+			d.timestamp = datetime.now()
 			session.add(d)
 			session.commit()
 
