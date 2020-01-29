@@ -1,5 +1,5 @@
 # import the necessary packages
-from dotenv import load_dotenv_
+from dotenv import load_dotenv
 from imutils.video import VideoStream
 from pyzbar import pyzbar
 import argparse
