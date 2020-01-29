@@ -1,0 +1,20 @@
+{% extends "base.html" %} 
+{% block content %} 
+<div class="card">
+  <div class="card-header">
+    Despachado
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">La caja {{ despacho.caja }} despachado</h5>
+    <p class="card-text">los siguientes datos</p>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">Cliente: {{despacho.cliente }}</li>
+      <li class="list-group-item">Placas: {{ despacho.placas }}</li>
+      <li class="list-group-item">Candado: {{ despacho.sello }}</li>
+      <li class="list-group-item">Hora de despacho: {{moment(despacho.despacho_timestamp, local=True).format('LLL') }}
+      </li>
+    </ul>
+    <a href="/" class="btn btn-success">OK</a>
+  </div>
+</div>
+{% endblock %}

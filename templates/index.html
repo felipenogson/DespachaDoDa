@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %} Despachos {% endblock %}
+{% block content %}
+         <h3>Despachos</h3>
+         <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Caja</th>
+                <th scope="col">Hora</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for despacho in despachos %}
+              <tr>
+                <td>{{despacho.caja}}</td>
+                <td><p>{{ moment(despacho.timestamp).format('LLL') }}</p></td>
+                <td>
+                <a class="btn btn-success" href="{{ url_for('despachando', despacho_id=despacho.id) }}" role="button">Despachar</a>
+                <a class="btn btn-primary" href="{{despacho.url}}" role="button" target="_new">Verificar</a>
+                <a class="btn btn-danger" href="#" role="button">Borrar</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+     </div>
+{% endblock %}

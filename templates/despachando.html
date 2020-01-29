@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %} 
+<h3>Despachando</h3>
+         <div class="card">
+          <article class="card-body">
+          <h4 class="card-title mb-4 mt-1">Caja: {{despacho.caja}}</h4>
+             <form method=POST >
+              <div class="form-group">
+                <label>Cliente</label>
+                  <input name="cliente" class="form-control" placeholder="">
+              </div> <!-- form-group// -->
+              <div class="form-group">
+                <label>Placas</label>
+                  <input name="placas" class="form-control" autocomplete="off" placeholder="Solo Numeros y Letras">
+              </div> <!-- form-group// -->
+              <div class="form-group">
+                <label>Candado</label>
+                  {% if despacho.sello == 'SIN CANDADO' %}
+                  <input  name='sello' class="form-control disabled" id="disabledInput" placeholder="{{despacho.sello}}" disabled>
+                  {% else %}
+                  <input name ='sello' class="form-control"  value="{{despacho.sello[3:-3]}}" type='number'>
+                  {% endif %}
+
+              </div> <!-- form-group// --> 
+              <div class="form-group"> 
+              </div> <!-- form-group// -->  
+              <div class="form-group">
+                  <button type="submit" class="btn btn-primary btn-block"> Validar  </button>
+              </div> <!-- form-group// -->                                                           
+          </form>
+          </article>
+          </div>
+
+    {% endblock %}
