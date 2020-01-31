@@ -9,13 +9,14 @@ import os
 
 load_dotenv()
 
-database_engine = os.env('database')
+database_engine = os.getenv('database')
 db_user = os.getenv('db_user')
 db_password = os.getenv('db_password')
 
 app = Flask(__name__)
 app.secret_key = 'f8eqo8j09453ws09453w5qe3g3e3w3459eqf8q7hqooqf3jqwoq4tqqf34w8r7hd89hq173jqoq9hyeq173h93w5354qgquqe9'
-app.config['SQLALCHEMY_DATABASE_URI'] = (f'mysql://{db_user}:{db_password}@127.0.0.1:3306/nogslbqf_despacho')
+#app.config['SQLALCHEMY_DATABASE_URI'] = (f'mysql://{db_user}:{db_password}@127.0.0.1:3306/nogslbqf_despacho')
+app.config['SQLALCHEMY_DATABASE_URI'] = ('sqlite:///data.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 moment = Moment(app)
 db = SQLAlchemy(app)
@@ -28,7 +29,7 @@ class Despacho(db.Model):
     cliente = db.Column(db.String(80))
     placas = db.Column(db.String(80))
     caja = db.Column(db.String(80))
-    sello = db.Column(db.Integer)
+    sello = db.Column(db.String(80))
     status = db.Column(db.String(80))
     timestamp = db.Column(db.DateTime, index=True, default= datetime.now)
     despacho_timestamp = db.Column(db.DateTime)
@@ -61,7 +62,7 @@ def errores():
 @app.route('/despachando/<despacho_id>', methods=['GET','POST'])
 def despachando(despacho_id):
     despacho_id = int(despacho_id)
-    despacho = Despacho.query.filter_by(id=despacho_id).first() 
+    despacho = Despacho.query.filter_by(id=despacho_id).first()
     if request.method == "POST":
        # Obteniendo los valores del usuario
        data_form = request.form
@@ -69,8 +70,7 @@ def despachando(despacho_id):
        user_placas = data_form['placas']
        if "sello" not in data_form:
            user_sello = 'SIN CANDADO'
-       else: user_sello = data_form['sello'] 
-          
+       else: user_sello = data_form['sello']
        #Limpiar las placas de caracteres que no sean letras o numeros
        regex = re.compile('[^a-zA-Z0-9]')
        placas = regex.sub('', despacho.placas)
