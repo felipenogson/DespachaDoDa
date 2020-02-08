@@ -136,7 +136,7 @@ def borrar(despacho_id):
     db.session.commit()
     return redirect(url_for('errores'))
 
-@app.route('/api/post', methods=['POST'])
+@app.route('/api', methods=['POST'])
 def doda_in():
     if not request.json or not 'url' in request.json:
         abort(400)
@@ -146,22 +146,9 @@ def doda_in():
             'status': 'pendiente',
             'timestamp': datetime.now(),
             }
+
+    # Si se encuentra en la base de datos envia el api envia los datoS
     despacho = Despacho.query.filter_by(url=doda['url']).first()
-    if despacho:
-        return jsonify({'mensaje':'entrada ya en sistema'}), 201
-
-    #Si no esta en la base de datos crea el objeto y lo inserta en la tabla, regresa los datos como confirmacion
-    d = Despacho(url=doda['url'], status=doda['status'], timestamp=doda['timestamp'])
-    db.session.add(d)
-    db.session.commit()
-    return jsonify({'doda': doda}), 201
-
-@app.route('/api/get', methods=['POST'])
-def doda_out():
-    if not request.json or not 'url' in request.json:
-        abort(400)
-    url = request.json['url']
-    despacho = Despacho.query.filter_by(url=url).first()
     if despacho:
         doda ={
                 "url" : despacho.url,
@@ -171,5 +158,11 @@ def doda_out():
                 "cliente" : despacho.cliente,
                 "timestamp" : despacho.timestamp
                 }
-        return jsonify(doda)
-    return jsonify({"status" : "No se eoncontro en el sistema"})
+        return jsonify({"doda":doda}), 201
+
+    #Si no esta en la base de datos crea el objeto y lo inserta en la tabla, regresa los datos como confirmacion
+    d = Despacho(url=doda['url'], status=doda['status'], timestamp=doda['timestamp'])
+    db.session.add(d)
+    db.session.commit()
+    return jsonify({'doda': doda}), 201
+
