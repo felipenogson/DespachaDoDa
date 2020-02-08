@@ -2,6 +2,7 @@
 from webapp import Despacho, db
 from helpers import get_sat_data
 from time import sleep
+from datetime import datetime
 
 print('Empezando el demonio')
 while True:
@@ -16,6 +17,7 @@ while True:
                 pend.caja = sat_info['candado']['Contenedores:']
                 pend.sello = sat_info['candado']['Candados:']
                 pend.status = 'correcto'
+                pend.timestamp = datetime.now()
                 db.session.add(pend)
                 db.session.commit()
                 print(f"Catch one, con status {pend.status}")
