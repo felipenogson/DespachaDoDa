@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, session
+from flask import Flask, render_template, request, flash, redirect, url_for, session, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_moment import Moment
 from datetime import datetime, timedelta
@@ -59,11 +59,15 @@ def errores():
     despachos = Despacho.query.filter(Despacho.status =='error')
     return render_template('errores.html', despachos=despachos)
 
-@app.route('/despachando/<despacho_id>', methods=['GET','POST'])
-def despachando(despacho_id):
-    despacho_id = int(despacho_id)
-    despacho = Despacho.query.filter_by(id=despacho_id).first()
-    if request.method == "POST":
+@app.route('/despachando', methods=['POST'])
+def despachando():
+    if request.form.get('get_id'):
+        despacho_id = request.form.get('get_id')
+        despacho = Despacho.query.filter_by(id=despacho_id).first()
+        return render_template('despachando.html', despacho=despacho)
+    if request.form.get('despacho_id'):
+       despacho_id = request.form.get('despacho_id')
+       despacho = Despacho.query.filter_by(id=despacho_id).first()
        # Obteniendo los valores del usuario
        data_form = request.form
        user_cliente = data_form['cliente']
@@ -75,13 +79,14 @@ def despachando(despacho_id):
        regex = re.compile('[^a-zA-Z0-9]')
        placas = regex.sub('', despacho.placas)
 
+       #Verificando que las placas correspondan con las del usuario
        if regex.sub('', user_placas).upper() != regex.sub('', despacho.placas).upper():
            flash('Las placas no corresponden, favor de verificar', 'danger')
-           return redirect(url_for('despachando', despacho_id=despacho.id))
+           return render_template('despachando.html', despacho=despacho)
 
-       elif user_sello != despacho.sello[3:]:
-           flash('El candado no corresponde, favor de verificar', 'danger') 
-           return redirect(url_for('despachando', despacho_id=despacho.id))
+       elif user_sello != despacho.sello:
+           flash('El candado no corresponde, favor de verificar', 'danger')
+           return render_template('despachando.html', despacho=despacho)
 
        else:
            despacho.cliente = user_cliente
@@ -90,13 +95,11 @@ def despachando(despacho_id):
            db.session.add(despacho)
            db.session.commit()
            return redirect(url_for('firma'))
-    return render_template('despachando.html', despacho=despacho)
-
 
 @app.route('/firma', methods=['GET', 'POST'])
 def firma():
     ''' Esta vista recoge la firma y la guarda en un archivo o en la base de datos para poder hacer reporte'''
-    despacho_id = int(session['despacho'])
+    despacho_id = session['despacho']
     despacho = Despacho.query.filter_by(id=despacho_id).first() 
     # Estas son pruebas para poder agarrar la firma de signature-pad y poder guardarla en un archivo
     # todavia viendo como enviar desde javascript
@@ -110,22 +113,63 @@ def firma():
         # Se manda la informacion a la base de datos
         despacho.firma_chofer = image_data
         despacho.status = 'despachado'
-        flash(f'El Contendedor {despacho.caja}, a sido despachado', 'success') 
         db.session.add(despacho)
         db.session.commit()
-        return redirect( url_for('despachado', despacho_id=despacho_id))
+        return redirect(url_for('despachado', despacho_id=despacho.id))
     return render_template("firma_pad.html")
 
 @app.route('/despachado/<int:despacho_id>')
 def despachado(despacho_id):
     despacho = Despacho.query.filter_by(id=despacho_id).first()
+    if (despacho == None) or ( despacho.status != 'despachado'):
+       flash('El despacho no se encuentra o no ha sido despachado', 'danger')
+       return redirect(url_for('index'))
     return render_template('despachado.html', despacho=despacho)
 
 @app.route('/borrar/<int:despacho_id>')
 def borrar(despacho_id):
     despacho = Despacho.query.filter_by(id=despacho_id).first()
     despacho.status = 'borrado'
+
     flash(f'La entrada con el codigo {despacho.url} a sido borrardo', 'danger')
-    db.session.add(despacho)
+    db.session.delete(despacho)
     db.session.commit()
     return redirect(url_for('errores'))
+
+@app.route('/api/post', methods=['POST'])
+def doda_in():
+    if not request.json or not 'url' in request.json:
+        abort(400)
+    # Hace un objeto json para regresar y para enviar a la base de datos
+    doda = {
+            'url': request.json['url'],
+            'status': 'pendiente',
+            'timestamp': datetime.now(),
+            }
+    despacho = Despacho.query.filter_by(url=doda['url']).first()
+    if despacho:
+        return jsonify({'mensaje':'entrada ya en sistema'}), 201
+
+    #Si no esta en la base de datos crea el objeto y lo inserta en la tabla, regresa los datos como confirmacion
+    d = Despacho(url=doda['url'], status=doda['status'], timestamp=doda['timestamp'])
+    db.session.add(d)
+    db.session.commit()
+    return jsonify({'doda': doda}), 201
+
+@app.route('/api/get', methods=['POST'])
+def doda_out():
+    if not request.json or not 'url' in request.json:
+        abort(400)
+    url = request.json['url']
+    despacho = Despacho.query.filter_by(url=url).first()
+    if despacho:
+        doda ={
+                "url" : despacho.url,
+                "status" : despacho.status,
+                "candado" : despacho.sello,
+                "caja" : despacho.caja,
+                "cliente" : despacho.cliente,
+                "timestamp" : despacho.timestamp
+                }
+        return jsonify(doda)
+    return jsonify({"status" : "No se eoncontro en el sistema"})

@@ -16,9 +16,11 @@
                 <td>{{despacho.caja}}</td>
                 <td><p>{{ moment(despacho.timestamp).format('LLL') }}</p></td>
                 <td>
-                <a class="btn btn-success" href="{{ url_for('despachando', despacho_id=despacho.id) }}" role="button">Despachar</a>
+                  <form action="{{url_for('despachando')}}" method="POST">
+                  <button type="submit" name="get_id" value="{{despacho.id}}" class="btn btn-success" role="button">Despachar</button>
                 <a class="btn btn-primary" href="{{despacho.url}}" role="button" target="_new">Verificar</a>
                 <a class="btn btn-danger" href="#" role="button">Borrar</a>
+                </form>
                 </td>
               </tr>
               {% endfor %}
