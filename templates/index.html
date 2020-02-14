@@ -14,7 +14,7 @@
               {% for despacho in despachos %}
               <tr>
                 <td>{{despacho.caja}}</td>
-                <td><p>{{ moment(despacho.timestamp).format('LLL') }}</p></td>
+                <td><p>{{ moment(despacho.timestamp, local=True).format('LLL') }}</p></td>
                 <td>
                   <form action="{{url_for('despachando')}}" method="POST">
                   <button type="submit" name="get_id" value="{{despacho.id}}" class="btn btn-success" role="button">Despachar</button>
