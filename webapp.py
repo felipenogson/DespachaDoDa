@@ -166,3 +166,7 @@ def doda_in():
     db.session.commit()
     return jsonify({'doda': doda}), 201
 
+@app.route('/qr_reader')
+def qr_reader():
+    return render_template("qr_reader.html")
+
