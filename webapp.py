@@ -44,12 +44,18 @@ def index():
     despachos = Despacho.query.filter(Despacho.timestamp >= todays_datetime).filter(Despacho.status =='correcto')
     return render_template('index.html', despachos=despachos)
 
-@app.route('/reporte')
+@app.route('/reporte', methods=['GET', 'POST'])
 def reporte():
-    todays_datetime = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
-    tomorrow_datetime = todays_datetime + timedelta(days=1)
-    #despachos = Despacho.query.filter_by(status='correcto')
-    despachos = Despacho.query.filter(Despacho.timestamp >= todays_datetime).filter(Despacho.status =='despachado')
+    if request.method == "POST":
+        user_date = request.form['fecha']
+        fecha = datetime.strptime(user_date, '%Y-%m-%d')
+        fecha_all_day = fecha + timedelta(days=1)
+        despachos = Despacho.query.filter(Despacho.timestamp >= fecha).filter(Despacho.timestamp <= fecha_all_day).filter(Despacho.status =='despachado')
+    else:
+        fecha = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
+        tomorrow_datetime = fecha + timedelta(days=1)
+        #despachos = Despacho.query.filter_by(status='correcto')
+        despachos = Despacho.query.filter(Despacho.timestamp >= fecha ).filter(Despacho.status =='despachado')
     return render_template('reporte.html', despachos=despachos)
 
 @app.route('/errores')

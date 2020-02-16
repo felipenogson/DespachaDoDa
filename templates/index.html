@@ -2,30 +2,32 @@
 {% set active_page = "index" %}
 {% block title %} Despachos {% endblock %}
 {% block content %}
-         <h3>Despachos</h3>
-         <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Caja</th>
-                <th scope="col">Hora</th>
-                <th scope="col">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for despacho in despachos %}
-              <tr>
-                <td>{{despacho.caja}}</td>
-                <td><p>{{ moment(despacho.timestamp, local=True).format('LLL') }}</p></td>
-                <td>
-                  <form action="{{url_for('despachando')}}" method="POST">
-                  <button type="submit" name="get_id" value="{{despacho.id}}" class="btn btn-success" role="button">Despachar</button>
-                <a class="btn btn-primary" href="{{despacho.url}}" role="button" target="_new">Verificar</a>
-                <a class="btn btn-danger" href="#" role="button">Borrar</a>
-                </form>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-     </div>
+<h3>Despachos</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Caja</th>
+      <th scope="col">Hora</th>
+      <th scope="col">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for despacho in despachos %}
+    <tr>
+      <td>{{despacho.caja}}</td>
+      <td>
+        <p>{{ moment(despacho.timestamp, local=True).format('LLL') }}</p>
+      </td>
+      <td>
+        <form action="{{url_for('despachando')}}" method="POST">
+          <button type="submit" name="get_id" value="{{despacho.id}}" class="btn btn-success"
+            role="button">Despachar</button>
+          <a class="btn btn-primary" href="{{despacho.url}}" role="button" target="_new">Verificar</a>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
 {% endblock %}

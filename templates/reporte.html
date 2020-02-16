@@ -1,36 +1,52 @@
-{% extends "base.html" %}        
+{% extends "base.html" %}
 {% set active_page = "reporte" %}
 {% block title %} Reporte Diario {% endblock %}
 {% block content %}
-         <h3>Reporte</h3>
-         <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Cliente</th>
-                <th scope="col">No. Integación</th>
-                <th scope="col">Caja</th>
-                <th scope="col">No. Sello</th>
-                <th scope="col">Hora Entrega</th>
-                <th scope="col">Hora Despacho</th>
-                <th scope="col">Firma chofer</th>
-                <th scope="col">Información</th>
-              </tr>
+<div class="row mt-3">
+  <div class="col">
 
-            </thead>
-            <tbody>
-              {% for despacho in despachos %}
-              <tr>
-                <td>{{despacho.cliente}}</td>
-                <td>{{despacho.url.split('=')[-1].strip()}}</td>
-                <td>{{despacho.caja}}</td>
-                <td>{{despacho.sello}}</td>
-                <td>{{ moment(despacho.timestamp, local=True).format('LLL') }}</td>
-                <td>{{ moment(despacho.despacho_timestamp, local=True).format('LLL') }}</td>
-                <td><img src="data:image/png;base64,{{base64encode(despacho.firma_chofer).decode()}}" height=100 width=100></td>
-                <th><a class="btn btn-primary" href="{{despacho.url}}" role="button" target="_new">SAT</a> </th>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-     </div>
+    <h3>Reporte</h3>
+  </div>
+  <div class="col">
+    <form action="{{ url_for('reporte') }}" method="POST" class="form-inline my-2 my-lg-0">
+      <input name="fecha" class="form-control mr-sm-2" type="date" placeholder="Buscar por fecha" aria-label="Search">
+      <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Generar</button>
+    </form>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Cliente</th>
+          <th scope="col">No. Integación</th>
+          <th scope="col">Caja</th>
+          <th scope="col">No. Sello</th>
+          <th scope="col">Hora Entrega</th>
+          <th scope="col">Hora Despacho</th>
+          <th scope="col">Firma chofer</th>
+          <th scope="col">Información</th>
+        </tr>
+
+      </thead>
+      <tbody>
+        {% for despacho in despachos %}
+        <tr>
+          <td>{{despacho.cliente}}</td>
+          <td>{{despacho.url.split('=')[-1].strip()}}</td>
+          <td>{{despacho.caja}}</td>
+          <td>{{despacho.sello}}</td>
+          <td>{{ moment(despacho.timestamp, local=True).format('LLL') }}</td>
+          <td>{{ moment(despacho.despacho_timestamp, local=True).format('LLL') }}</td>
+          <td><img src="data:image/png;base64,{{base64encode(despacho.firma_chofer).decode()}}" height=100 width=100>
+          </td>
+          <th><a class="btn btn-primary" href="{{despacho.url}}" role="button" target="_new">SAT</a> </th>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
 {% endblock %}
