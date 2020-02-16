@@ -12,31 +12,36 @@
     {{ moment.include_moment() }}
     {{ moment.locale('es')}}
 
-    <title>{% block title %} {% endblock %} - DespachaDODA</title>
+    <title>{% block title %} {% endblock %} - DespachoDODA</title>
+    <meta name="theme-color" content="#f00">
+
   </head>
   <body>
-     <nav class="navbar navbar-expand-sm navbar-light bg-light">
-         <a class="navbar-brand" href="{{url_for('index')}}">DespachaDODA</a>
+     <nav class="navbar navbar-expand-sm navbar-dark bg-primary">
+         <a class="navbar-brand" href="{{url_for('index')}}">DespachoDODA</a>
          <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
              aria-expanded="false" aria-label="Toggle navigation">
              <span class="navbar-toggler-icon"></span>
          </button>
          <div class="collapse navbar-collapse" id="collapsibleNavId">
              <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                 <li class="nav-item active">
-                     <a class="nav-link" href="{{url_for('index')}}">Despachador <span class="sr-only">(current)</span></a>
-                 </li>
-                 <li class="nav-item">
-                     <a class="nav-link" href="{{url_for('reporte')}}">Reporte Diario</a>
-                 </li>
-                 <li class="nav-item">
-                   <a href="{{url_for('qr_reader')}}" class="nav-link">Lector QR</a>
-         
+               {% set navigation_bar = [
+               ( url_for('index'), "index", "Despachador"),
+               ( url_for('reporte'), "reporte", "Reportes"),
+               ( url_for('qr_reader'), "lectorQR", "Lector QR")
+               ] %}
+
+               {% set active_page = active_page %}
+               {% for url, id, caption in navigation_bar %}
+               <li class="nav-item {% if id == active_page %}active{% endif %}">
+                 <a class="nav-link" href="{{url}}">{{caption}}<span class="sr-only">(current)</span></a>
+               </li>
+               {% endfor %}
              </ul>
-             <a href="{{url_for('errores')}}" class="nav-link" style="color:#880000">Errores</a>
+             <a href="{{url_for('errores')}}" class="nav-link {% if active_page == 'errores' %} text-light {% else %}text-warning{% endif %}" >Errores</a>
   
      </nav> 
-     <div class="container">
+     <div class="container" style="min-height:90vh">
 
          {% with messages = get_flashed_messages(with_categories=True) %}
          {% if messages %}
@@ -52,7 +57,16 @@
         {% block content %} {% endblock %}
       </div>
 
+<!-- Footer -->
+<footer class="page-footer font-small blue">
 
+  <!-- Copyright -->
+  <div class="footer-copyright text-center py-3">© 2020 Copyright:
+		<a href="mailto:felipe@nogson.com">Contacto por email: felipe@nogson.com</a>
+  </div>
+  <!-- Copyright -->
+
+</footer>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
