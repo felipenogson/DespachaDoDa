@@ -6,9 +6,21 @@
           <h4 class="card-title mb-4 mt-1">Caja: {{despacho.caja}}</h4>
              <form method=POST class="needs-validation">
               <div class="form-group">
-                <label>Cliente</label>
-                  <input name="cliente" class="form-control" placeholder="Cliente" autocomplete="on" required>
-                  <div class="invalid-feedback">Require nombre de cliente</div>
+                <div class="form-row">
+                  <div class="col-8">
+                    <label>Cliente</label>
+                    <input name="cliente" class="form-control" placeholder="Cliente" autocomplete="on" required>
+                    <div class="invalid-feedback">Require nombre de cliente</div>
+                  </div>
+                  <div class="col-2">
+                    <label>Numero de bultos</label>
+                    <input name="bultos" type="number" class="form-control" autocomplete="off">
+                  </div>
+                  <div class="col-2">
+                    <label>Numero de Facturas</label>
+                    <input name="facturas" type="number" class="form-control" autocomplete="off">
+                  </div>
+                </div>
               </div> <!-- form-group// -->
               <div class="form-group">
                 <label>Placas</label>
