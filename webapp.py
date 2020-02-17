@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, session, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_moment import Moment
+from flask_migrate import Migrate
 from datetime import datetime, timedelta
 import re
 import base64
@@ -20,6 +21,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = ('sqlite:///data.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 moment = Moment(app)
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 app.jinja_env.globals.update(base64encode = base64.b64encode)
 
 class Despacho(db.Model):
@@ -30,6 +32,8 @@ class Despacho(db.Model):
     placas = db.Column(db.String(80))
     caja = db.Column(db.String(80))
     sello = db.Column(db.String(80))
+    facturas = db.Column(db.Integer)
+    bultos = db.Column(db.Integer)
     status = db.Column(db.String(80))
     timestamp = db.Column(db.DateTime, index=True, default= datetime.now)
     despacho_timestamp = db.Column(db.DateTime)
@@ -78,6 +82,9 @@ def despachando():
        data_form = request.form
        user_cliente = data_form['cliente']
        user_placas = data_form['placas']
+       user_bultos = data_form['bultos']
+       user_facturas = data_form['facturas']
+
        if "sello" not in data_form:
            user_sello = 'SIN CANDADO'
        else: user_sello = data_form['sello']
@@ -97,6 +104,8 @@ def despachando():
        else:
            despacho.cliente = user_cliente
            despacho.despacho_timestamp = datetime.now()
+           despacho.bultos = user_bultos
+           despacho.facturas = user_facturas
            session['despacho'] = despacho.id
            db.session.add(despacho)
            db.session.commit()
