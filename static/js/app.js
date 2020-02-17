@@ -1,8 +1,8 @@
 var xhr = new XMLHttpRequest();
 var wrapper = document.getElementById("signature-pad");
 var clearButton = wrapper.querySelector("[data-action=clear]");
-var savePNGButton = wrapper.querySelector("[data-action=save-png]");
 var sendPOSTButton = wrapper.querySelector("[data-action=send-post]");
+var regresarButton = wrapper.querySelector("[data-action=regresar");
 var canvas = wrapper.querySelector("canvas");
 var signaturePad = new SignaturePad(canvas, {
   // It's Necessary to use an opaque color when saving image as JPEG;
@@ -75,15 +75,6 @@ clearButton.addEventListener("click", function (event) {
   signaturePad.clear();
 });
 
-savePNGButton.addEventListener("click", function (event) {
-  if (signaturePad.isEmpty()) {
-    alert("Please provide a signature first.");
-  } else {
-    var dataURL = signaturePad.toDataURL();
-    download(dataURL, "signature.png");
-  }
-});
-
 sendPOSTButton.addEventListener("click", function (event) {
   if (signaturePad.isEmpty()) {
     alert("Please provide a signature first.");
@@ -102,3 +93,7 @@ sendPOSTButton.addEventListener("click", function (event) {
   }
   // download(dataURL, "signature.png");
 });
+
+regresarButton.addEventListener("click", function(event){
+  window.location.replace("/")
+})
