@@ -22,9 +22,11 @@
           <th scope="col">Cliente</th>
           <th scope="col">No. Integación</th>
           <th scope="col">Caja</th>
-          <th scope="col">No. Sello</th>
+          <th scope="col">No. Candado</th>
           <th scope="col">Hora Entrega</th>
           <th scope="col">Hora Despacho</th>
+          <th scope="col">Bultos</th>
+          <th scope="col">Facturas</th>
           <th scope="col">Firma chofer</th>
           <th scope="col">Información</th>
         </tr>
@@ -39,6 +41,8 @@
           <td>{{despacho.sello}}</td>
           <td>{{ moment(despacho.timestamp, local=True).format('LLL') }}</td>
           <td>{{ moment(despacho.despacho_timestamp, local=True).format('LLL') }}</td>
+          <td>{{despacho.bultos}}</td>
+          <td>{{despacho.facturas}}</td>
           <td><img src="data:image/png;base64,{{base64encode(despacho.firma_chofer).decode()}}" height=100 width=100>
           </td>
           <th><a class="btn btn-primary" href="{{despacho.url}}" role="button" target="_new">SAT</a> </th>

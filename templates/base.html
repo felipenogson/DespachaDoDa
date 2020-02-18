@@ -31,7 +31,8 @@
         {% set navigation_bar = [
                ( url_for('index'), "index", "Despachador"),
                ( url_for('reporte'), "reporte", "Reportes"),
-               ( url_for('qr_reader'), "lectorQR", "Lector QR")
+               ( url_for('qr_reader'), "lectorQR", "Lector QR"),
+               ( url_for('errores'), "errores", "Errores"),
                ] %}
 
         {% set active_page = active_page %}
@@ -41,8 +42,6 @@
         </li>
         {% endfor %}
       </ul>
-      <a href="{{url_for('errores')}}"
-        class="nav-link {% if active_page == 'errores' %} text-light {% else %}text-warning{% endif %}">Errores</a>
     </div>
 
   </nav>
