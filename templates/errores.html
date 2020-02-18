@@ -37,14 +37,11 @@
     </table>
   </div>
 </div>
-
 {% for despacho in despachos %}
-</div>
 <div class="modal fade" id="modal{{despacho.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
   aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-    </div>
     <div class="modal-header">
       <h5 class="modal-title" id="exampleModalLabel">Borrar entrada</h5>
       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -58,9 +55,8 @@
       <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
       <a class="btn btn-danger" href="{{ url_for('borrar', despacho_id=despacho.id)}}" role="button">Borrar</a>
     </div>
+    </div>
   </div>
-</div>
-</div>
 </div>
 {% endfor %}
 {% endblock %}
