@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, session, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
 from flask_moment import Moment
 from flask_migrate import Migrate
 from datetime import datetime, timedelta
@@ -7,12 +8,6 @@ import re
 import base64
 from dotenv import load_dotenv
 import os
-
-load_dotenv()
-
-database_engine = os.getenv('database')
-db_user = os.getenv('db_user')
-db_password = os.getenv('db_password')
 
 app = Flask(__name__)
 app.secret_key = 'f8eqo8j09453ws09453w5qe3g3e3w3459eqf8q7hqooqf3jqwoq4tqqf34w8r7hd89hq173jqoq9hyeq173h93w5354qgquqe9'
@@ -22,7 +17,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 moment = Moment(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+#Agrega la funcion de decodificar blobs en los templates 
 app.jinja_env.globals.update(base64encode = base64.b64encode)
+
+@app.shell_context_processor
+def make_shell_context():
+    ''' funcion para que flask shell carge automatico despachos y db '''
+    return { 'db' : db, 'Despacho': Despacho}
 
 class Despacho(db.Model):
     '''Creando el esquema para la base de datos''' 
@@ -61,6 +63,18 @@ def reporte():
         #despachos = Despacho.query.filter_by(status='correcto')
         despachos = Despacho.query.filter(Despacho.timestamp >= fecha ).filter(Despacho.status =='despachado')
     return render_template('reporte.html', despachos=despachos)
+
+@app.route('/reporte_caja', methods=['GET', 'POST'])
+def reporte_caja():
+    despachos = None
+    if request.method == "POST":
+        user_caja = request.form['caja']
+        despachos = Despacho.query.filter_by(caja=user_caja.upper()).order_by(desc(Despacho.despacho_timestamp)).limit(5).all()
+    else:
+        fecha = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
+        tomorrow_datetime = fecha + timedelta(days=1)
+        #despachos = Despacho.query.filter_by(status='correcto')
+    return render_template('reporte_caja.html', despachos=despachos)
 
 @app.route('/errores')
 def errores():

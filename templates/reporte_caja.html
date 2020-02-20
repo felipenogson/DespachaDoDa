@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% set active_page = "reporte_placas" %}
+{% block title %} Reporte Diario {% endblock %}
+{% block content %}
+<div class="row mt-3">
+  <div class="col">
+
+    <h3>Reporte de Caja:</h3>
+  </div>
+  <div class="col">
+    <form action="{{ url_for('reporte_caja') }}" method="POST" class="form-inline my-2 my-lg-0">
+      <input name="fecha" class="form-control mr-sm-2" type="text" placeholder="Solo numeros y letras" aria-label="Search">
+      <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Generar</button>
+    </form>
+  </div>
+</div>
+<hr>
+{% if despachos != None %}
+<div class="row">
+  <div class="col">Caja: {{ despacho[0].caja }} </div>
+  <div class="col">Placas: {{ despacho[0].placas }}</div>
+</div>
+<div class="row">
+  <div class="col">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Cliente</th>
+          <th scope="col">No. Integación</th>
+          <th scope="col">Caja</th>
+          <th scope="col">No. Candado</th>
+          <th scope="col">Hora Entrega</th>
+          <th scope="col">Hora Despacho</th>
+          <th scope="col">Bultos</th>
+          <th scope="col">Facturas</th>
+          <th scope="col">Firma chofer</th>
+          <th scope="col">Información</th>
+        </tr>
+
+      </thead>
+      <tbody>
+        {% for despacho in despachos %}
+        <tr>
+          <td>{{despacho.cliente}}</td>
+          <td>{{despacho.url.split('=')[-1].strip()}}</td>
+          <td>{{despacho.caja}}</td>
+          <td>{{despacho.sello}}</td>
+          <td>{{ moment(despacho.timestamp, local=True).format('LLL') }}</td>
+          <td>{{ moment(despacho.despacho_timestamp, local=True).format('LLL') }}</td>
+          <td>{{despacho.bultos}}</td>
+          <td>{{despacho.facturas}}</td>
+          <td><img src="data:image/png;base64,{{base64encode(despacho.firma_chofer).decode()}}" height=100 width=100>
+          </td>
+          <th><a class="btn btn-primary" href="{{despacho.url}}" role="button" target="_new">SAT</a> </th>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+</div>
+{% endblock %}
