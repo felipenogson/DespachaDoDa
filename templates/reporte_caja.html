@@ -9,7 +9,7 @@
   </div>
   <div class="col">
     <form action="{{ url_for('reporte_caja') }}" method="POST" class="form-inline my-2 my-lg-0">
-      <input name="fecha" class="form-control mr-sm-2" type="text" placeholder="Solo numeros y letras" aria-label="Search">
+      <input name="caja" class="form-control mr-sm-2" type="text" placeholder="Solo numeros y letras" aria-label="Search">
       <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Generar</button>
     </form>
   </div>
@@ -17,8 +17,8 @@
 <hr>
 {% if despachos != None %}
 <div class="row">
-  <div class="col">Caja: {{ despacho[0].caja }} </div>
-  <div class="col">Placas: {{ despacho[0].placas }}</div>
+  <div class="col"><h2>Caja: {{ despachos[0].caja }}</h2> </div>
+  <div class="col"><h2>Placas: {{ despachos[0].placas }}</h2></div>
 </div>
 <div class="row">
   <div class="col">
