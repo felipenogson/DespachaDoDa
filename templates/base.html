@@ -15,12 +15,12 @@
   {{ moment.locale('es')}}
 
   <title>{% block title %} {% endblock %} - DespachoDODA</title>
-  <meta name="theme-color" content="#f00">
+  <meta name="theme-color" content="#007bff">
 
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-sm navbar-dark bg-primary">
+  <nav class="navbar navbar-expand-sm navbar-dark bg-primary fixed-top">
     <a class="navbar-brand" href="{{url_for('index')}}">DespachoDODA</a>
     <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId"
       aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,7 @@
     </div>
 
   </nav>
-  <div class="container" style="min-height:90vh">
+  <div class="container" style="margin-top:10vh; min-height:90vh">
 
     {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
