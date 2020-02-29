@@ -66,7 +66,6 @@ def reporte():
 
 @app.route('/reporte_caja', methods=['GET', 'POST'])
 def reporte_caja():
-    despachos = None
     if request.method == "POST":
         user_caja = request.form['caja']
         despachos = Despacho.query.filter_by(caja=user_caja.upper()).order_by(desc(Despacho.despacho_timestamp)).limit(5).all()
@@ -74,6 +73,8 @@ def reporte_caja():
         fecha = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
         tomorrow_datetime = fecha + timedelta(days=1)
         #despachos = Despacho.query.filter_by(status='correcto')
+    if len(despachos) == 0: 
+        despachos = None
     return render_template('reporte_caja.html', despachos=despachos)
 
 @app.route('/errores')

@@ -3,6 +3,7 @@ from webapp import Despacho, db
 from helpers import get_sat_data
 from time import sleep
 from datetime import datetime
+import re
 
 print('Empezando el demonio')
 while True:
@@ -13,7 +14,10 @@ while True:
             sat_info = get_sat_data(pend.url)
             try:
                 sat_info['pedimentos'][0]['Pedimento:']
-                pend.placas = sat_info['pedimentos'][0]['Datos de Identificación  del Vehículo:']
+                # Limpia las placas de caracteres especiales como -
+                regex = re.compile('[^a-zA-Z0-9]')
+                placas = regex.sub('', sat_info['pedimentos'][0]['Datos de Identificación  del Vehículo:'])
+                pend.placas = placas
                 pend.caja = sat_info['candado']['Contenedores:']
                 pend.sello = sat_info['candado']['Candados:']
                 pend.status = 'correcto'
