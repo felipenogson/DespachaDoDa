@@ -14,7 +14,7 @@
   {{ moment.include_moment() }}
   {{ moment.locale('es')}}
 
-  <title>{% block title %} {% endblock %} - DespachoDODA</title>
+  <title>{% block title %} {% endblock %} - DespachosDODA</title>
   <meta name="theme-color" content="#007bff">
 
 </head>
@@ -28,6 +28,7 @@
     </button>
     <div class="collapse navbar-collapse" id="collapsibleNavId">
       <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+
         {% set navigation_bar = [
                ( url_for('index'), "index", "Despachador"),
                ( url_for('reporte'), "reporte", "Reportes"),
@@ -41,6 +42,20 @@
           <a class="nav-link" href="{{url}}">{{caption}}<span class="sr-only">(current)</span></a>
         </li>
         {% endfor %}
+      </ul>
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+           {{ current_user.username }} 
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+            <p>{{ current_user.first_name}} {{current_user.last_name }}</p>
+            <a class="dropdown-item" href="{{ url_for('user.edit_user_profile') }}">Editar Perfil</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{{ url_for('user.logout')}}">Salir</a>
+          </div>
+        </li>
       </ul>
     </div>
 

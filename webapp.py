@@ -2,7 +2,10 @@ from flask import Flask, render_template, request, flash, redirect, url_for, ses
 from flask_sqlalchemy import SQLAlchemy
 from flask_moment import Moment
 from flask_migrate import Migrate
+from flask_babelex import Babel
+from flask_user import UserManager, login_required, current_user
 from datetime import datetime, timedelta
+from config import ConfigClass
 import re
 import base64
 from dotenv import load_dotenv
@@ -15,33 +18,25 @@ db_user = os.getenv('db_user')
 db_password = os.getenv('db_password')
 
 app = Flask(__name__)
-app.secret_key = 'f8eqo8j09453ws09453w5qe3g3e3w3459eqf8q7hqooqf3jqwoq4tqqf34w8r7hd89hq173jqoq9hyeq173h93w5354qgquqe9'
-#app.config['SQLALCHEMY_DATABASE_URI'] = (f'mysql://{db_user}:{db_password}@127.0.0.1:3306/nogslbqf_despacho')
-app.config['SQLALCHEMY_DATABASE_URI'] = ('sqlite:///data.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.from_object(ConfigClass)
 moment = Moment(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+babel = Babel(app)
+
+from models import Despacho, User
+
+#Exporta la funcion b64encode a los templates para mostrar los blobs como imagenes
 app.jinja_env.globals.update(base64encode = base64.b64encode)
 
-class Despacho(db.Model):
-    '''Creando el esquema para la base de datos''' 
-    id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String(120), unique=True, nullable=False)
-    cliente = db.Column(db.String(80))
-    placas = db.Column(db.String(80))
-    caja = db.Column(db.String(80))
-    sello = db.Column(db.String(80))
-    facturas = db.Column(db.Integer)
-    bultos = db.Column(db.Integer)
-    status = db.Column(db.String(80))
-    timestamp = db.Column(db.DateTime, index=True, default= datetime.now)
-    despacho_timestamp = db.Column(db.DateTime)
-    firma_chofer = db.Column(db.Text)
-    def __repr__(self):
-        return '<despacho {}'.format(self.url)
+user_manager = UserManager(app, db, User)
 
 @app.route('/')
+def home_page():
+    return redirect(url_for('user.login'))
+
+@app.route('/despachos')
+@login_required
 def index():
     todays_datetime = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
     #despachos = Despacho.query.filter_by(status='correcto')
@@ -49,6 +44,7 @@ def index():
     return render_template('index.html', despachos=despachos)
 
 @app.route('/reporte', methods=['GET', 'POST'])
+@login_required
 def reporte():
     if request.method == "POST":
         user_date = request.form['fecha']
@@ -63,6 +59,7 @@ def reporte():
     return render_template('reporte.html', despachos=despachos)
 
 @app.route('/errores')
+@login_required
 def errores():
     todays_datetime = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
     #despachos = Despacho.query.filter_by(status='correcto')
@@ -70,6 +67,7 @@ def errores():
     return render_template('errores.html', despachos=despachos)
 
 @app.route('/despachando', methods=['POST'])
+@login_required
 def despachando():
     if request.form.get('get_id'):
         despacho_id = request.form.get('get_id')
@@ -112,6 +110,7 @@ def despachando():
            return redirect(url_for('firma'))
 
 @app.route('/firma', methods=['GET', 'POST'])
+@login_required
 def firma():
     ''' Esta vista recoge la firma y la guarda en un archivo o en la base de datos para poder hacer reporte'''
     despacho_id = session['despacho']
@@ -128,12 +127,14 @@ def firma():
         # Se manda la informacion a la base de datos
         despacho.firma_chofer = image_data
         despacho.status = 'despachado'
+        despacho.user = current_user
         db.session.add(despacho)
         db.session.commit()
         return redirect(url_for('despachado', despacho_id=despacho.id))
     return render_template("firma_pad.html")
 
 @app.route('/despachado/<int:despacho_id>')
+@login_required
 def despachado(despacho_id):
     despacho = Despacho.query.filter_by(id=despacho_id).first()
     if (despacho == None) or ( despacho.status != 'despachado'):
@@ -142,6 +143,7 @@ def despachado(despacho_id):
     return render_template('despachado.html', despacho=despacho)
 
 @app.route('/borrar/<int:despacho_id>')
+@login_required
 def borrar(despacho_id):
     despacho = Despacho.query.filter_by(id=despacho_id).first()
     despacho.status = 'borrado'
@@ -182,6 +184,7 @@ def doda_in():
     return jsonify({'doda': doda}), 201
 
 @app.route('/qr_reader')
+@login_required
 def qr_reader():
     return render_template("qr_reader.html")
 
