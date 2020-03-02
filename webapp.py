@@ -8,27 +8,20 @@ from datetime import datetime, timedelta
 from config import ConfigClass
 import re
 import base64
-from dotenv import load_dotenv
 import os
-
-load_dotenv()
-
-database_engine = os.getenv('database')
-db_user = os.getenv('db_user')
-db_password = os.getenv('db_password')
 
 app = Flask(__name__)
 app.config.from_object(ConfigClass)
 moment = Moment(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-babel = Babel(app)
 
 from models import Despacho, User
 
 #Exporta la funcion b64encode a los templates para mostrar los blobs como imagenes
 app.jinja_env.globals.update(base64encode = base64.b64encode)
 
+babel = Babel(app)
 user_manager = UserManager(app, db, User)
 
 @app.route('/')
@@ -38,31 +31,36 @@ def home_page():
 @app.route('/despachos')
 @login_required
 def index():
+    '''Pagina principal de la aplicación, se muestran los despachos listos '''
+    # Obtiene la fecha de el dia de hoy para filtrar las entradas
     todays_datetime = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
     #despachos = Despacho.query.filter_by(status='correcto')
+    #query para mostrar los despachos de la fecha de el dia de hoy
     despachos = Despacho.query.filter(Despacho.timestamp >= todays_datetime).filter(Despacho.status =='correcto')
     return render_template('index.html', despachos=despachos)
 
 @app.route('/reporte', methods=['GET', 'POST'])
 @login_required
 def reporte():
+    '''Pagina de los reportes '''
     if request.method == "POST":
+        #Si la peticion es un POST obtiene las entradas de la fecha que se envia en el formulario
         user_date = request.form['fecha']
         fecha = datetime.strptime(user_date, '%Y-%m-%d')
         fecha_all_day = fecha + timedelta(days=1)
         despachos = Despacho.query.filter(Despacho.timestamp >= fecha).filter(Despacho.timestamp <= fecha_all_day).filter(Despacho.status =='despachado')
     else:
+        # Si es un get muestra los despachos de el dia de hoy
         fecha = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
         tomorrow_datetime = fecha + timedelta(days=1)
-        #despachos = Despacho.query.filter_by(status='correcto')
         despachos = Despacho.query.filter(Despacho.timestamp >= fecha ).filter(Despacho.status =='despachado')
     return render_template('reporte.html', despachos=despachos)
 
 @app.route('/errores')
 @login_required
 def errores():
+    ''' Si el codigo QR no se pudo verificar los datos requeridos de el sito del SAT el codigo cae en esta categoria '''
     todays_datetime = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
-    #despachos = Despacho.query.filter_by(status='correcto')
     despachos = Despacho.query.filter(Despacho.status =='error')
     return render_template('errores.html', despachos=despachos)
 
@@ -112,11 +110,9 @@ def despachando():
 @app.route('/firma', methods=['GET', 'POST'])
 @login_required
 def firma():
-    ''' Esta vista recoge la firma y la guarda en un archivo o en la base de datos para poder hacer reporte'''
+    ''' Esta vista recoge la firma y la guarda en la base de datos como BLOB, para este modulo se usa una libreria JS externa '''
     despacho_id = session['despacho']
     despacho = Despacho.query.filter_by(id=despacho_id).first() 
-    # Estas son pruebas para poder agarrar la firma de signature-pad y poder guardarla en un archivo
-    # todavia viendo como enviar desde javascript
     if request.method == 'POST':
         # Obtenemos la imagen en base64, lista para agregarla a la base de datos
         # Los espacios son repmplazados por + para que la imagen pueda ser codificada de nuevo
@@ -142,12 +138,12 @@ def despachado(despacho_id):
        return redirect(url_for('index'))
     return render_template('despachado.html', despacho=despacho)
 
+#TODO: hay que revisar esta vista por que parece te permite borrar entradas aleatorias
 @app.route('/borrar/<int:despacho_id>')
 @login_required
 def borrar(despacho_id):
     despacho = Despacho.query.filter_by(id=despacho_id).first()
     despacho.status = 'borrado'
-
     flash(f'La entrada con el codigo {despacho.url} a sido borrardo', 'danger')
     db.session.delete(despacho)
     db.session.commit()
@@ -186,5 +182,6 @@ def doda_in():
 @app.route('/qr_reader')
 @login_required
 def qr_reader():
+    ''' usando JS abre la camara y escanea el codigo hace uso de la vista api '''
     return render_template("qr_reader.html")
 
