@@ -1,8 +1,10 @@
+
 var xhr = new XMLHttpRequest();
 var wrapper = document.getElementById("signature-pad");
 var clearButton = wrapper.querySelector("[data-action=clear]");
+var undoButton = wrapper.querySelector("[data-action=undo]");
 var sendPOSTButton = wrapper.querySelector("[data-action=send-post]");
-var regresarButton = wrapper.querySelector("[data-action=regresar");
+var regresarButton = wrapper.querySelector("[data-action=regresar]");
 var canvas = wrapper.querySelector("canvas");
 var signaturePad = new SignaturePad(canvas, {
   // It's Necessary to use an opaque color when saving image as JPEG;
@@ -17,7 +19,7 @@ function resizeCanvas() {
   // When zoomed out to less than 100%, for some very strange reason,
   // some browsers report devicePixelRatio as less than 1
   // and only part of the canvas is cleared then.
-  var ratio = Math.max(window.devicePixelRatio || 1, 1);
+  var ratio =  Math.max(window.devicePixelRatio || 1, 1);
 
   // This part causes the canvas to be cleared
   canvas.width = canvas.offsetWidth * ratio;
@@ -38,18 +40,22 @@ window.onresize = resizeCanvas;
 resizeCanvas();
 
 function download(dataURL, filename) {
-  var blob = dataURLToBlob(dataURL);
-  var url = window.URL.createObjectURL(blob);
+  if (navigator.userAgent.indexOf("Safari") > -1 && navigator.userAgent.indexOf("Chrome") === -1) {
+    window.open(dataURL);
+  } else {
+    var blob = dataURLToBlob(dataURL);
+    var url = window.URL.createObjectURL(blob);
 
-  var a = document.createElement("a");
-  a.style = "display: none";
-  a.href = url;
-  a.download = filename;
+    var a = document.createElement("a");
+    a.style = "display: none";
+    a.href = url;
+    a.download = filename;
 
-  document.body.appendChild(a);
-  a.click();
+    document.body.appendChild(a);
+    a.click();
 
-  window.URL.revokeObjectURL(url);
+    window.URL.revokeObjectURL(url);
+  }
 }
 
 // One could simply use Canvas#toBlob method instead, but it's just to show
@@ -66,9 +72,7 @@ function dataURLToBlob(dataURL) {
     uInt8Array[i] = raw.charCodeAt(i);
   }
 
-  return new Blob([uInt8Array], {
-    type: contentType
-  });
+  return new Blob([uInt8Array], { type: contentType });
 }
 
 clearButton.addEventListener("click", function (event) {
@@ -82,16 +86,14 @@ sendPOSTButton.addEventListener("click", function (event) {
     var dataURL = signaturePad.toDataURL();
     xhr.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
-         window.location.replace(this.responseURL);
-      } else {
-      }
+            window.location.replace(this.responseURL);
+      } 
     }
     xhr.open("POST", "/firma", true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
     // console.log(dataURL);
-    xhr.send("firma=" + dataURL);
+    xhr.send("firma=" + dataURL)
   }
-  // download(dataURL, "signature.png");
 });
 
 regresarButton.addEventListener("click", function(event){

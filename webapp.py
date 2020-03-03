@@ -184,4 +184,3 @@ def doda_in():
 def qr_reader():
     ''' usando JS abre la camara y escanea el codigo hace uso de la vista api '''
     return render_template("qr_reader.html")
-

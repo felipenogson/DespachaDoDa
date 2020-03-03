@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/signature-pad.css')}}">
 
   <!--[if IE]>
-    <link rel="stylesheet" type="text/css" href="css/ie9.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/ie9.css') }}">
   <![endif]-->
 
 </head>
@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='js/signature_pad.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/signature_pad.umd.js') }}"></script>
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
