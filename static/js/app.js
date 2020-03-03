@@ -2,7 +2,7 @@ var xhr = new XMLHttpRequest();
 var wrapper = document.getElementById("signature-pad");
 var clearButton = wrapper.querySelector("[data-action=clear]");
 var sendPOSTButton = wrapper.querySelector("[data-action=send-post]");
-var regresarButton = wrapper.querySelector("[data-action=regresar");
+var regresarButton = wrapper.querySelector("[data-action=regresar]");
 var canvas = wrapper.querySelector("canvas");
 var signaturePad = new SignaturePad(canvas, {
   // It's Necessary to use an opaque color when saving image as JPEG;
